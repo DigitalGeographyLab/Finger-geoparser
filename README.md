@@ -68,4 +68,11 @@ Other resources used in either the pipeline or this code:
  - [Spacy-fi pipeline](https://github.com/aajanki/spacy-fi) by Antti Ajasti, MIT License.
 
 ### TODO
-- add to do
+ - Package this project and make it pip-installable. Overall, make installation and usage more straightforward.
+ - Learn more about and implement tests.
+ - Some sort of config file or argument parser instead of passing parameters to the _geoparse_ method?
+ - Test out the lemmatizer more. I think it might've problems with rarer place names. Like _Vesijärvellä_ is fine, but _Joutjärvellä_ doesn't get lemmatized. Extend dictionary or implement another type of lemmatizer?
+ - Implement a Voikko-based typo checker and fixer.
+ - Implement gazetteers/API's other than GeoNames. [Nimisampo](https://nimisampo.fi/fi/app) has potential in the Finnish context.
+ - Implement text-preprocessing steps. Removing hashtags for instance?
+ - Implement geocoding / toponym resolution step other than a simple query. The literature should provide hints.
