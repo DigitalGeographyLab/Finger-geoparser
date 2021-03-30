@@ -1,5 +1,5 @@
 # Finnish geoparser
-_Geoparsing_ is the process of finding location mentions in texts (_geotagging_) and defining geographical representations, such as coordinate points, for them (_geocoding_). This is the first implementation of a Finnish geoparser, built on state-of-the-art methods yet using established Python libraries. This program consists of three classes, the geotagger, the geocoder and the geoparser, which wraps the whole process.
+_Geoparsing_ is the process of finding location mentions (toponyms or place names) in texts (_geotagging_) and defining geographical representations, such as coordinate points, for them (_geocoding_). This is the first implementation of a Finnish geoparser, built on state-of-the-art methods yet using established Python libraries. This program consists of three classes, the geotagger, the geocoder and the geoparser, which wraps the whole process.
 
 ### Geotagger
 The geotagger is built using [Spacy NLP library](https://spacy.io/) and it implements BERT-based language model for a more accurate representation of language and thus better results. The pipeline runs a complete linguistic analysis (part-of-speech tagging, morphological analysis, dependency parsing, token and sentence segmentation, lemmatization), but named entity recognition (NER) is the important part. Input texts' named locations, such as countries, lakes and important sights, are recognized, then returned to their base form using the lemmatizer. These results are passed on to the geocoder.
@@ -76,3 +76,4 @@ Other resources used in either the pipeline or this code:
  - Implement gazetteers/API's other than GeoNames. [Nimisampo](https://nimisampo.fi/fi/app) has potential in the Finnish context.
  - Implement text-preprocessing steps. Removing hashtags for instance?
  - Implement geocoding / toponym resolution step other than a simple query. The literature should provide hints.
+ - Use the linguistic pipeline results (stored in the doc object) in some way. Useful in toponym resolution?
