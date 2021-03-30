@@ -8,7 +8,7 @@ The geotagger is built using [Spacy NLP library](https://spacy.io/) and it imple
 The geocoder currently simply queries the [GeoNames](https://www.geonames.org/) gazetteer using the Python library [Geocoder](https://geocoder.readthedocs.io/) and outputs coordinate points, if matches are found. I plan to expand this functionality in the future.
 
 ### Data model
-Currently, the program accepts strings or lists of strings as input. The input is assumed to be in Finnish and preprocessed to sufficiently segmented to short-ish pieces (so that the input isn't for example a whole book chapter as a string). 
+Currently, the program accepts strings or lists of strings as input. The input is assumed to be in Finnish and segmented to short-ish pieces (so that the input isn't for example a whole book chapter as a string). 
 
 Most users will want to use the _geoparser_ module, as it wraps geoparsing pipeline and functions under a simple principle: text in, results out. [See below for an example](#usage-example). The output of the process is a [_Pandas dataframe_](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) with the following columns:
 
