@@ -17,10 +17,10 @@ Most users will want to use the _geoparser_ module, as it wraps geoparsing pipel
 | input_text | The input sentence - *string* | "Matti Järvi vietti tänään hienon päivän Lahdessa" |
 | doc | Spacy doc object of the sent analysis - [*doc*](https://spacy.io/api/doc) | Matti Järvi vietti tänään hienon päivän Lahdessa |
 | locations_found | Whether locations were found in the input sent - *boolean* | True |
-| locations | Location tokens in the og wordform, if found - *list of string(s)* or *none* | "Lahdessa" |
-| loc_lemmas | Lemmatized versions of the locations - *list of string(s)* or *none* | "Lahti" |
-| gn_names | Versions of the locations returned by querying GeoNames - *list of string(s)* or *none* | "Lahti" |
-| gn_points | Long/lat coordinate points in WGS84 - *tuple*, *Shapely Point* or *none* | (25.66151, 60.98267) |
+| locations | Location tokens in the og wordform, if found - *(list of) string(s)* or *none* | "Lahdessa" |
+| loc_lemmas | Lemmatized versions of the locations - *(list of) string(s)* or *none* | "Lahti" |
+| gn_names | Versions of the locations returned by querying GeoNames - *(list of) string(s)* or *none* | "Lahti" |
+| gn_points | Long/lat coordinate points in WGS84 - (*list of*) *tuple(s)*, *Shapely Point(s)* or *none* | (25.66151, 60.98267) |
 
 NOTE. There's some redundancy in the output currently. This is mostly because I want to cover every base at this point. The data model is still subject to change as the work progresses.
 
