@@ -68,6 +68,8 @@ Other resources used in either the pipeline or this code:
  - [Spacy-fi pipeline](https://github.com/aajanki/spacy-fi) by Antti Ajasti, MIT License.
 
 ### TODO
+ - Alter the output so that each successfully geoparsed toponym is in a row of its own. Toponyms from the same input can be connected with an id from another column.
+ - Add toponym's location in the input, e.g. character span in the input string from start to end, as a column.
  - Package this project and make it pip-installable. Overall, make installation and usage more straightforward.
  - Learn more about and implement tests.
  - Some sort of config file or argument parser instead of passing parameters to the _geoparse_ method?
