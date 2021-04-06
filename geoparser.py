@@ -38,6 +38,7 @@ class geoparser:
         pipeline_path | String: name of the Spacy pipeline, which is called with spacy.load().
                                 "fi_geoparser", which is the installation name, by default,
                                 however, a path to the files can also be provided.
+                                
         
         use_gpu | Boolean: Whether the pipeline is run on the GPU (significantly faster, but often missing in
                            e.g. laptops) or CPU (slower but should run every time). Default True.
@@ -63,9 +64,8 @@ class geoparser:
         
         self.verbose=verbose
         
-        self.drop_non_locs = drop_non_locations
         
-    def geoparse(self, texts):
+    def geoparse(self, texts, ids=None):
         """
         The whole geoparsing pipeline.
         
@@ -86,14 +86,20 @@ class geoparser:
         # fix if someone passes just a string
         if isinstance(texts, str):
             texts = [texts]
+        
+        if ids:
+            if isinstance(ids, (str, int, float)):
+                ids = [ids]
+            assert len(texts) == len(ids), "If ids are passed, the number of ids and texts must be equal."
+            
             
         
         if self.verbose:
             print("Starting geotagging...")
         t = time.time()
         
-        # GEOPARSE
-        tag_results = self.tagger.tag_sentences(texts)
+        # GEOTAG
+        tag_results = self.tagger.tag_sentences(texts, ids)
 
         if self.verbose:
             successfuls = tag_results['locations_found'].tolist()

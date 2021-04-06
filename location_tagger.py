@@ -45,7 +45,7 @@ class location_tagger:
         
         self.drop_non_locs = drop_non_locs
         
-    def tag_sentences(self, input_texts):
+    def tag_sentences(self, input_texts, ids):
         """Input: list of strings
         
         Output: Pandas DF containing columns:
@@ -63,7 +63,7 @@ class location_tagger:
             tag_results = self.tag_sentence(sent)
             tagged_sentences.append(tag_results)
         
-        return self.to_dataframe(tagged_sentences)
+        return self.to_dataframe(tagged_sentences, ids)
         """
         if self.output_df:
             return self.to_dataframe(tagged_sentences)
@@ -100,9 +100,12 @@ class location_tagger:
         else:
             return sent_results
         
-    def to_dataframe(self, results):
+    def to_dataframe(self, results, ids):
         import pandas as pd
         df = pd.DataFrame(results)
+        
+        if ids:
+            df['id'] = ids
 
         if self.drop_non_locs:
             return self.drop_non_locations(df)
