@@ -31,8 +31,7 @@ class geoparser:
     """
     
     def __init__(self, pipeline_path="fi_geoparser", use_gpu=True, 
-                 output_df=True, gn_username="", drop_non_locations=False, 
-                 verbose=True, return_shapely_points=False):
+                 output_df=True, gn_username="", verbose=True):
         """
         Parameters:
         pipeline_path | String: name of the Spacy pipeline, which is called with spacy.load().
@@ -57,15 +56,15 @@ class geoparser:
                                          regular tuples or Shapely points. Default False.
         """
 
-        self.tagger = location_tagger(pipeline_path, use_gpu=use_gpu, 
-                                      drop_non_locs=drop_non_locations)
+        self.tagger = location_tagger(pipeline_path, use_gpu=use_gpu)
         
-        self.coder = location_coder(gn_username=gn_username, shp_points=return_shapely_points)
+        self.coder = location_coder(gn_username=gn_username)
         
         self.verbose=verbose
         
         
-    def geoparse(self, texts, ids=None):
+    def geoparse(self, texts, ids=None, explode_df=False, return_shapely_points=False,
+                  drop_non_locations=False):
         """
         The whole geoparsing pipeline.
         
@@ -99,7 +98,8 @@ class geoparser:
         t = time.time()
         
         # GEOTAG
-        tag_results = self.tagger.tag_sentences(texts, ids)
+        tag_results = self.tagger.tag_sentences(texts, ids, explode_df=explode_df,
+                                                drop_non_locs=drop_non_locations)
 
         if self.verbose:
             successfuls = tag_results['locations_found'].tolist()
@@ -107,7 +107,8 @@ class geoparser:
               len(texts), "sentences found to have locations mentioned.")
         
         # GEOCODE
-        geocode_results = self.coder.geocode_batch(tag_results)
+        geocode_results = self.coder.geocode_batch(tag_results, shp_points=return_shapely_points,
+                                                   exploded=explode_df)
         
         if self.verbose:    
             print("Geocoding done, returning dataframe.")

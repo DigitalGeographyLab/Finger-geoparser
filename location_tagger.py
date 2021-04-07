@@ -33,7 +33,7 @@ class location_tagger:
     
         
     def __init__(self, pipeline_path="fi_geoparser", use_gpu=True, 
-                 output_df=True, drop_non_locs=False):
+                 output_df=True):
         if use_gpu:
             spacy.require_gpu()
         else:
@@ -43,9 +43,11 @@ class location_tagger:
         
         self.ner_pipeline = spacy.load(pipeline_path)
         
-        self.drop_non_locs = drop_non_locs
+
         
-    def tag_sentences(self, input_texts, ids):
+
+        
+    def tag_sentences(self, input_texts, ids, explode_df=False, drop_non_locs=False):
         """Input: list of strings
         
         Output: Pandas DF containing columns:
@@ -57,6 +59,10 @@ class location_tagger:
         """
         assert input_texts, "No input provided. Make sure to input a list of strings."
         tagged_sentences = []
+        
+        self.explode_df = explode_df
+        
+        self.drop_non_locs = drop_non_locs
         
         # loop input sentences, gather the tagged dictionary results to a list
         for sent in input_texts:
@@ -82,7 +88,8 @@ class location_tagger:
         locs = []
         loc_lemmas = []
         locations_found = False
-        sent_results = {'input_text': sent, 'doc': doc, 'locations': None, 'loc_lemmas': None,'locations_found': locations_found}
+        sent_results = {'input_text': sent, 'doc': doc, 'locations': None, 'loc_lemmas': None,
+                        'loc_spans': None, 'locations_found': locations_found}
         if doc:
             # gather the NER labels found to a list 
             labels = [ent.label_ for ent in doc.ents]
@@ -91,10 +98,11 @@ class location_tagger:
                 docs.append(doc)
                 locs = [ent.text for ent in doc.ents if ent.label_=='LOC']
                 loc_lemmas = [ent.lemma_ for ent in doc.ents if ent.label_=='LOC']
+                loc_spans = [(ent.start_char, ent.end_char) for ent in doc.ents if ent.label_=='LOC']
                 locations_found = True
 
                 sent_results = {'input_text': sent, 'doc': doc, 'locations_found': locations_found, 
-                            'locations': locs, 'loc_lemmas': loc_lemmas}
+                            'locations': locs, 'loc_lemmas': loc_lemmas, 'loc_spans': loc_spans}
                     
             return sent_results
         else:
@@ -102,11 +110,17 @@ class location_tagger:
         
     def to_dataframe(self, results, ids):
         import pandas as pd
+
         df = pd.DataFrame(results)
+        
         
         if ids:
             df['id'] = ids
+            
+        df['input_order'] = df.index
 
+        if self.explode_df:
+            df = df.apply(lambda x: x.explode() if x.name in ['locations', 'loc_lemmas', 'loc_spans'] else x)
         if self.drop_non_locs:
             return self.drop_non_locations(df)
         else:
