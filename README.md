@@ -15,12 +15,16 @@ Most users will want to use the _geoparser_ module, as it wraps geoparsing pipel
 | Column header | Description and data type | Example |
 | --- | --- | --- |
 | input_text | The input sentence - *string* | "Matti Järvi vietti tänään hienon päivän Lahdessa" |
+| input_order | The index of the inserted texts. i.e. the first text is 0, the second 1 etc. - int | 0 |
 | doc | Spacy doc object of the sent analysis - [*doc*](https://spacy.io/api/doc) | Matti Järvi vietti tänään hienon päivän Lahdessa |
 | locations_found | Whether locations were found in the input sent - *boolean* | True |
 | locations | Location tokens in the og wordform, if found - *(list of) string(s)* or *none* | "Lahdessa" |
 | loc_lemmas | Lemmatized versions of the locations - *(list of) string(s)* or *none* | "Lahti" |
+| loc_spans | index of the start and end characters of the identified locations in the input text string - tuple | (40, 48) |
 | gn_names | Versions of the locations returned by querying GeoNames - *(list of) string(s)* or *none* | "Lahti" |
 | gn_points | Long/lat coordinate points in WGS84 - (*list of*) *tuple(s)*, *Shapely Point(s)* or *none* | (25.66151, 60.98267) |
+| *id |The identifying element, like tweet id, tied to each input text. Optional - string, int, float | "first_sentence" |
+
 
 NOTE. There's some redundancy in the output currently. This is mostly because I want to cover every base at this point. The data model is still subject to change as the work progresses.
 
@@ -68,8 +72,8 @@ Other resources used in either the pipeline or this code:
  - [Spacy-fi pipeline](https://github.com/aajanki/spacy-fi) by Antti Ajasti, MIT License.
 
 ### TODO
- - Alter the output so that each successfully geoparsed toponym is in a row of its own. Toponyms from the same input can be connected with an id from another column.
- - Add toponym's location in the input, e.g. character span in the input string from start to end, as a column.
+ - ~~Alter the output so that each successfully geoparsed toponym is in a row of its own. Toponyms from the same input can be connected with an id from another column.~~
+ - ~~Add toponym's location in the input, e.g. character span in the input string from start to end, as a column.~~
  - Package this project and make it pip-installable. Overall, make installation and usage more straightforward.
  - Learn more about and implement tests.
  - Some sort of config file or argument parser instead of passing parameters to the _geoparse_ method?
@@ -79,4 +83,4 @@ Other resources used in either the pipeline or this code:
  - Implement text-preprocessing steps. Removing hashtags for instance?
  - Implement geocoding / toponym resolution step other than a simple query. The literature should provide hints.
  - Use the linguistic pipeline results (stored in the doc object) in some way. Useful in toponym resolution?
- - Add an _identifier_ keyword argument. If this is present, it'll be added to the output df and can be used to identify the individual inputs (e.g. tweets by id, texts by their writer). Maybe require a list that's as long as the input list? So that each id is assumed to be in the same index as each input.
+ - ~~Add an _identifier_ keyword argument. If this is present, it'll be added to the output df and can be used to identify the individual inputs (e.g. tweets by id, texts by their writer). Maybe require a list that's as long as the input list? So that each id is assumed to be in the same index as each input.~~
