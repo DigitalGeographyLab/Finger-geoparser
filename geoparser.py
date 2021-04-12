@@ -46,14 +46,10 @@ class geoparser:
         
         gn_username | String: GeoNames API key, or username, which is used for geocoding.
                               Mandatory, get from https://www.geonames.org/
-                              
-        drop_non_locations | Boolean: Whether the sentences where no locations were found are
-                                      included in the output. Default False (locs are included).
         
         verbose | Boolean: Prints progress reports. Default True.
         
-        return_shapely_points | Boolean: Whether the coordinate points of the locations are 
-                                         regular tuples or Shapely points. Default False.
+
         """
 
         self.tagger = location_tagger(pipeline_path, use_gpu=use_gpu)
@@ -69,7 +65,15 @@ class geoparser:
         The whole geoparsing pipeline.
         
         Input:
-            String or a list of strings
+            texts | A string or a list of input strings: The input 
+            *ids | String, int, float or a list: Identifying element of each input, e.g. tweet id. Must be 
+                  the same length as texts
+            *explode_df | Boolean: Whether to have each location "hit" on separate rows in the output. Default False
+            *return_shapely_points | Boolean: Whether the coordinate points of the locations are 
+                                         regular tuples or Shapely points. Default False.
+            *drop_non_locations | Boolean: Whether the sentences where no locations were found are
+                                        included in the output. Default False (locs are included).
+            
         Output:
             Pandas Dataframe containing columns:
                 1. input_text: the input sentence | String
@@ -77,8 +81,14 @@ class geoparser:
                 3. locations_found: Whether locations were found in the input sent | Bool
                 4. locations: locations in the input text, if found | list of strings or None
                 5. loc_lemmas: lemmatized versions of the locations | list of strings or None
-                6. gn_names: versions of the names returned by querying GeoNames | List of strins or None
-                7. gn_points: long/lat coordinate points in WGS84 | list of long/lat tuples or Shapely points
+                6. loc_spans: the index of the start and end characters of the identified 
+                              locations in the input text string | tuple
+                7. input_order: the index of the inserted texts. i.e. the first text is 0, the second 1 etc.
+                                Makes it easier to reassemble the results if they're exploded | int'
+                
+                8. gn_names: versions of the names returned by querying GeoNames | List of strins or None
+                9. gn_points: long/lat coordinate points in WGS84 | list of long/lat tuples or Shapely points
+                10.*id: The identifying element tied to each input text, if provided | string, int, float 
         """
         assert texts, "Input missing. Expecting a (list of) strings."
         
@@ -86,6 +96,7 @@ class geoparser:
         if isinstance(texts, str):
             texts = [texts]
         
+        # check that ids are in proper formast and lengths
         if ids:
             if isinstance(ids, (str, int, float)):
                 ids = [ids]
@@ -103,14 +114,14 @@ class geoparser:
 
         if self.verbose:
             successfuls = tag_results['locations_found'].tolist()
-            print("Finished geotagging.", successfuls.count(True), "out of", 
-              len(texts), "sentences found to have locations mentioned.")
+            print("Finished geotagging.", successfuls.count(True), "location hits found.")
+            print("Starting geocoding...")
         
         # GEOCODE
         geocode_results = self.coder.geocode_batch(tag_results, shp_points=return_shapely_points,
                                                    exploded=explode_df)
         
         if self.verbose:    
-            print("Geocoding done, returning dataframe.")
+            print("Finished geocoding, returning dataframe.")
             print("Total elapsed time:", round(time.time()-t, 2),"s")
         return geocode_results
