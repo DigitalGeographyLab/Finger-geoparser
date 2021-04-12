@@ -45,8 +45,8 @@ Python interpreter is started in the Finnish geoparser folder and in an environm
 >>>input = ["Matti Järvi vietti tänään hienon päivän Lahden Messilässä", "Olympialaisten avajaiset tekstitettiin suomen kielelle"]
 >>>results = parser.geoparse(input)
 Starting geotagging...
-Finished geotagging. 1 out of 2 sentences found to have locations mentioned.
-Geocoding done, returning dataframe.
+Finished geotagging. 1 location hits found.
+Starting geocoding...
 Total elapsed time: 0.33 s
 >>>print(results[['loc_lemmas','gn_coord_points']])
          loc_lemmas                               gn_coord_points
