@@ -12,18 +12,18 @@ Currently, the program accepts strings or lists of strings as input. The input i
 
 Most users will want to use the _geoparser_ module, as it wraps geoparsing pipeline and functions under a simple principle: text in, results out. [See below for an example](#usage-example). The output of the process is a [_Pandas dataframe_](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) with the following columns:
 
-| Column header | Description and data type | Example |
-| --- | --- | --- |
-| input_text | The input sentence - *string* | "Matti Järvi vietti tänään hienon päivän Lahdessa" |
-| input_order | The index of the inserted texts. i.e. the first text is 0, the second 1 etc. - int | 0 |
-| doc | Spacy doc object of the sent analysis - [*doc*](https://spacy.io/api/doc) | Matti Järvi vietti tänään hienon päivän Lahdessa |
-| locations_found | Whether locations were found in the input sent - *boolean* | True |
-| locations | Location tokens in the og wordform, if found - *(list of) string(s)* or *none* | "Lahdessa" |
-| loc_lemmas | Lemmatized versions of the locations - *(list of) string(s)* or *none* | "Lahti" |
-| loc_spans | index of the start and end characters of the identified locations in the input text string - tuple | (40, 48) |
-| gn_names | Versions of the locations returned by querying GeoNames - *(list of) string(s)* or *none* | "Lahti" |
-| gn_points | Long/lat coordinate points in WGS84 - (*list of*) *tuple(s)*, *Shapely Point(s)* or *none* | (25.66151, 60.98267) |
-| *id |The identifying element, like tweet id, tied to each input text. Optional - string, int, float | "first_sentence" |
+| Column header | Description | Data type | Example |
+| --- | --- | --- | --- |
+| input_text | The input sentence | *string* | "Matti Järvi vietti tänään hienon päivän Lahdessa" |
+| input_order | The index of the inserted texts. i.e. the first text is 0, the second 1 etc. | *int* | 0 |
+| doc | Spacy doc object of the sent analysis | [*doc*](https://spacy.io/api/doc) | Matti Järvi vietti tänään hienon päivän Lahdessa |
+| locations_found | Whether locations were found in the input sent | *boolean* | True |
+| locations | Location tokens in the og wordform, if found | *(list of) string(s)* or *none* | "Lahdessa" |
+| loc_lemmas | Lemmatized versions of the locations | *(list of) string(s)* or *none* | "Lahti" |
+| loc_spans | index of the start and end characters of the identified locations in the input text string | *tuple* | (40, 48) |
+| gn_names | Versions of the locations returned by querying GeoNames | *(list of) string(s)* or *none* | "Lahti" |
+| gn_points | Long/lat coordinate points in WGS84 | (*list of*) *tuple(s)*, *Shapely Point(s)* or *none* | (25.66151, 60.98267) |
+| * id |The identifying element, like tweet id, tied to each input text. Optional | *string*, *int*, *float* | "first_sentence" |
 
 
 NOTE. There's some redundancy in the output currently. This is mostly because I want to cover every base at this point. The data model is still subject to change as the work progresses.
