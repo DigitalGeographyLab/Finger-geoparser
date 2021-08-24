@@ -60,21 +60,26 @@ class geoparser:
         
         
     def geoparse(self, texts, ids=None, explode_df=False, return_shapely_points=False,
-                  drop_non_locations=False):
+                  drop_non_locations=False, output='all'):
         """
         The whole geoparsing pipeline.
         
         Input:
-            texts | A string or a list of input strings: The input 
+            texts | A string or a list of input strings: The input text(s)
             *ids | String, int, float or a list: Identifying element of each input, e.g. tweet id. Must be 
                   the same length as texts
             *explode_df | Boolean: Whether to have each location "hit" on separate rows in the output. Default False
             *return_shapely_points | Boolean: Whether the coordinate points of the locations are 
                                          regular tuples or Shapely points. Default False.
             *drop_non_locations | Boolean: Whether the sentences where no locations were found are
-                                        included in the output. Default False (locs are included).
+                                        included in the output. Default False (non-locs are included).
+            *output | String: What's included in the output and in what format it is.
+                                        Possible values: 
+                                            1. 'all': All columns listed below as a dataframe
+                                            TODO 2. 'essential': Dataframe trimmed down selection of columns
+                                            3. 'eupeg': 
             
-        Output:
+        Output columns:
             Pandas Dataframe containing columns:
                 1. input_text: the input sentence | String
                 2. doc: Spacy doc object of the sent analysis. See https://spacy.io/api/doc | Doc
@@ -85,23 +90,28 @@ class geoparser:
                               locations in the input text string | tuple
                 7. input_order: the index of the inserted texts. i.e. the first text is 0, the second 1 etc.
                                 Makes it easier to reassemble the results if they're exploded | int'
-                
-                8. gn_names: versions of the names returned by querying GeoNames | List of strins or None
-                9. gn_points: long/lat coordinate points in WGS84 | list of long/lat tuples or Shapely points
-                10.*id: The identifying element tied to each input text, if provided | string, int, float 
+                8. names: versions of the names returned by querying GeoNames | List of strins or None
+                9. coord_points: long/lat coordinate points in WGS84 | list of long/lat tuples or Shapely points
+                10.*id: The identifying element tied to each input text, if provided | string, int, float
+            OR
+            EUPEG (see here: https://github.com/geoai-lab/EUPEG) style json dump, with restucturing data and renaming headers to be in line. 
+            Mostly meant for evaluation purposes. This option only allows one text to be processed at once (no batch processing).
+            
         """
         assert texts, "Input missing. Expecting a (list of) strings."
         
         # fix if someone passes just a string
         if isinstance(texts, str):
             texts = [texts]
+            
+        if output.lower() == 'eupeg':
+            explode_df = True
         
-        # check that ids are in proper formast and lengths
+        # check that ids are in proper formats and lengths
         if ids:
             if isinstance(ids, (str, int, float)):
                 ids = [ids]
             assert len(texts) == len(ids), "If ids are passed, the number of ids and texts must be equal."
-            
             
         
         if self.verbose:
@@ -121,7 +131,8 @@ class geoparser:
         geocode_results = self.coder.geocode_batch(tag_results, shp_points=return_shapely_points,
                                                    exploded=explode_df)
         
+        
         if self.verbose:    
-            print("Finished geocoding, returning dataframe.")
+            print("Finished geocoding, returning output.")
             print("Total elapsed time:", round(time.time()-t, 2),"s")
         return geocode_results

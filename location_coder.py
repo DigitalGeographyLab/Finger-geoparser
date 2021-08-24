@@ -41,8 +41,8 @@ class location_coder:
         """
         Applies geocoding to the lemmatized locations in the input dataframe.
         """
-        locations['gn_names'] = None
-        locations['gn_coord_points'] = None
+        locations['names'] = None
+        locations['coord_points'] = None
         
         self.shp_points = shp_points
         
@@ -86,8 +86,8 @@ class location_coder:
                 loc_coord_points = None
                 loc_names = None
                     
-            row['gn_names'] = loc_names
-            row['gn_coord_points'] = loc_coord_points
+            row['names'] = loc_names
+            row['coord_points'] = loc_coord_points
             
             return row
         else:

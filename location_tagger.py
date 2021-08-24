@@ -28,7 +28,6 @@ class location_tagger:
         output_df | Boolean: If True, the output will be a Pandas DataFrame. If False, a dictionary.
                             Currently, False does nothing. Left in if newer versions implement something
                             other than Pandas (just nested dictionaries?)
-        
         """
     
         
@@ -48,7 +47,13 @@ class location_tagger:
 
         
     def tag_sentences(self, input_texts, ids, explode_df=False, drop_non_locs=False):
-        """Input: list of strings
+        """Input:            
+            texts | A string or a list of input strings: The input 
+            *ids | String, int, float or a list: Identifying element of each input, e.g. tweet id. Must be 
+                  the same length as texts
+            *explode_df | Boolean: Whether to have each location "hit" on separate rows in the output. Default False
+            *drop_non_locations | Boolean: Whether the sentences where no locations were found are
+                                        included in the output. Default False (locs are included).
         
         Output: Pandas DF containing columns:
                 1. input_text: the input sentence | String
@@ -56,6 +61,11 @@ class location_tagger:
                 3. locations_found: Whether locations were found in the input sent | Bool
                 4. locations: locations in the input text, if found | list of strings or None
                 5. loc_lemmas: lemmatized versions of the locations | list of strings or None
+                6. loc_spans: the index of the start and end characters of the identified 
+                              locations in the input text string | tuple
+                7. input_order: the index of the inserted texts. i.e. the first text is 0, the second 1 etc.
+                                Makes it easier to reassemble the results if they're exploded | int'
+                *8. id: The identifying element tied to each input text, if provided | string, int, float 
         """
         assert input_texts, "No input provided. Make sure to input a list of strings."
         tagged_sentences = []
@@ -118,7 +128,8 @@ class location_tagger:
             df['id'] = ids
             
         df['input_order'] = df.index
-
+        
+        # split the possible list contents into multiple rows
         if self.explode_df:
             df = df.apply(lambda x: x.explode() if x.name in ['locations', 'loc_lemmas', 'loc_spans'] else x)
         if self.drop_non_locs:
