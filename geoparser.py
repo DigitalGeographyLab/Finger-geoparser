@@ -8,6 +8,7 @@ Created on Wed Mar 24 18:55:46 2021
 
 from location_tagger import location_tagger
 from location_coder import location_coder
+from output_formatter import create_eupeg_json
 import time
 
 class geoparser:
@@ -135,4 +136,8 @@ class geoparser:
         if self.verbose:    
             print("Finished geocoding, returning output.")
             print("Total elapsed time:", round(time.time()-t, 2),"s")
-        return geocode_results
+            
+        if output.lower() == 'eupeg':
+            return create_eupeg_json(geocode_results)
+        else:
+            return geocode_results

@@ -8,7 +8,8 @@ import geocoder.geonames as gn
 #import pandas as pd
 try:
     from shapely.geometry import Point
-except ImportError:
+except (ImportError, FileNotFoundError) as e:
+    print("Unable to import Shapely. The geoparser works, but export to Shapely points unavailable." 
     pass
 
 class location_coder:
