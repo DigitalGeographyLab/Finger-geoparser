@@ -5,12 +5,12 @@ Created on Wed Mar 24 18:53:37 2021
 @author: Tatu Leppämäki
 """
 import geocoder.geonames as gn
+import warnings
 #import pandas as pd
 try:
     from shapely.geometry import Point
 except (ImportError, FileNotFoundError) as e:
-    print("Unable to import Shapely. The geoparser works, but export to Shapely points unavailable." 
-    pass
+    print("Unable to import Shapely. The geoparser works, but export to Shapely points unavailable.")
 
 class location_coder:
     
@@ -31,6 +31,17 @@ class location_coder:
         #if self.shp_points:
             #from shapely.geometry import Point
         
+        self.username_count = 0
+            
+        if isinstance(gn_username, (list, tuple, set)):
+            self.username=gn_username[self.username_count]
+            self.username_list = gn_username
+            #self.username_list_flag = True
+        else:
+            self.username=gn_username
+            self.username_list = [gn_username]
+            #self.username_list_flag = False
+        
         self.username=gn_username
         
         assert self.username, "GeoNames API key (username) must be provided for the geocoder."
@@ -42,12 +53,17 @@ class location_coder:
         """
         Applies geocoding to the lemmatized locations in the input dataframe.
         """
+        
+        
         locations['names'] = None
         locations['coord_points'] = None
         
         self.shp_points = shp_points
         
         self.exploded = exploded
+        
+        self.geocoded_count = 0
+        
         
         locations = locations.apply(self.geocode_set, axis=1)
         
@@ -75,6 +91,8 @@ class location_coder:
             for loc in row['loc_lemmas']:
                 #query geonames
                 gn_result = gn(loc, key=self.username)
+                # for every query, add one to the count
+                self.geocoded_count += 1
                 # if succesful, add the name of the place in GN and coordinates
                 if gn_result.ok:
                     loc_coord_points.append(self.form_point(gn_result))
@@ -90,9 +108,27 @@ class location_coder:
             row['names'] = loc_names
             row['coord_points'] = loc_coord_points
             
+            # if count nears 1000, i.e. the hourly rate limit of a GN account
+            # is filling, try to switch the account
+            if self.geocoded_count > 999:
+                switched = self.switch_username()
+                if switched:
+                    print("\nUsername switched to username no.", str(self.username_count+1), "\n")
+                else:
+                    print("\nHourly rate limit exceeded and no more GN usernames left. Rest of queries likely to fail.\n")
+                self.geocoded_count = 0
+            
             return row
         else:
             return row
+        
+    def switch_username(self):
+        if self.username_count+1 < len(self.username_list):
+            self.username_count += 1
+            self.username=self.username_list[self.username_count]
+            return True
+        else:
+            return False
         
     def form_point(self, gn_result):
         if self.shp_points:
