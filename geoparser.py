@@ -31,7 +31,7 @@ class geoparser:
 
     """
     
-    def __init__(self, pipeline_path="fi_geoparser", use_gpu=True, 
+    def __init__(self, pipeline_path="fi_geoparser", use_gpu=False, 
                  output_df=True, gn_username="", verbose=True):
         """
         Parameters:
@@ -61,7 +61,7 @@ class geoparser:
         
         
     def geoparse(self, texts, ids=None, explode_df=False, return_shapely_points=False,
-                  drop_non_locations=False, output='all'):
+                  drop_non_locations=False, output='all', filter_toponyms=True):
         """
         The whole geoparsing pipeline.
         
@@ -79,6 +79,8 @@ class geoparser:
                                             1. 'all': All columns listed below as a dataframe
                                             TODO 2. 'essential': Dataframe trimmed down selection of columns
                                             3. 'eupeg': 
+            *filter_toponyms | Boolean: Whether to filter out almost certain false positive toponyms.
+                                        Currently removes toponyms with length less than 2. Default True.
             
         Output columns:
             Pandas Dataframe containing columns:
@@ -119,16 +121,17 @@ class geoparser:
             print("Starting geotagging...")
         t = time.time()
         
-        # GEOTAG
+        # TOPONYM RECOGNITION
         tag_results = self.tagger.tag_sentences(texts, ids, explode_df=explode_df,
-                                                drop_non_locs=drop_non_locations)
+                                                drop_non_locs=drop_non_locations,
+                                                filter_toponyms=filter_toponyms)
 
         if self.verbose:
             successfuls = tag_results['locations_found'].tolist()
-            print("Finished geotagging.", successfuls.count(True), "location hits found.")
+            print("Finished geotagging after", round(time.time()-t, 2),"s.", successfuls.count(True), "location hits found.")
             print("Starting geocoding...")
         
-        # GEOCODE
+        # TOPONYM RESOLVING
         geocode_results = self.coder.geocode_batch(tag_results, shp_points=return_shapely_points,
                                                    exploded=explode_df)
         

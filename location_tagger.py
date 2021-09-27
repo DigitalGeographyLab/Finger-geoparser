@@ -46,7 +46,9 @@ class location_tagger:
         
 
         
-    def tag_sentences(self, input_texts, ids, explode_df=False, drop_non_locs=False):
+    def tag_sentences(self, input_texts, ids, explode_df=False, drop_non_locs=False,
+                            filter_toponyms = True
+        ):
         """Input:            
             texts | A string or a list of input strings: The input 
             *ids | String, int, float or a list: Identifying element of each input, e.g. tweet id. Must be 
@@ -54,6 +56,8 @@ class location_tagger:
             *explode_df | Boolean: Whether to have each location "hit" on separate rows in the output. Default False
             *drop_non_locations | Boolean: Whether the sentences where no locations were found are
                                         included in the output. Default False (locs are included).
+            *filter_toponyms | Boolean: Whether to filter out almost certain false positive toponyms.
+                                        Currently removes toponyms with length less than 2. Default True.
         
         Output: Pandas DF containing columns:
                 1. input_text: the input sentence | String
@@ -73,6 +77,8 @@ class location_tagger:
         self.explode_df = explode_df
         
         self.drop_non_locs = drop_non_locs
+        
+        self.filter_toponyms = filter_toponyms
         
         # loop input sentences, gather the tagged dictionary results to a list
         for sent in input_texts:
@@ -97,6 +103,7 @@ class location_tagger:
         docs = []
         locs = []
         loc_lemmas = []
+        loc_spans = []
         locations_found = False
         sent_results = {'input_text': sent, 'doc': doc, 'locations': None, 'loc_lemmas': None,
                         'loc_spans': None, 'locations_found': locations_found}
@@ -105,10 +112,25 @@ class location_tagger:
             labels = [ent.label_ for ent in doc.ents]
             # create the whole dict if locations are present
             if 'LOC' in labels:
+                locs = []
+                for ent in doc.ents:
+                    if ent.label_=='LOC':
+                        if self.filter_toponyms:
+                            if len(ent.text)>1:
+                                locs.append(ent.text)
+                                loc_lemmas.append(ent.lemma_)
+                                loc_spans.append((ent.start_char, ent.end_char))
+                        else:
+                            locs.append(ent.text)
+                            loc_lemmas.append(ent.lemma_)
+                            loc_spans.append((ent.start_char, ent.end_char))
                 docs.append(doc)
-                locs = [ent.text for ent in doc.ents if ent.label_=='LOC']
+                """
+                locs = [ent.text for ent in doc.ents if ent.label_=='LOC' if self.filter_toponyms if len(ent.text)>1]
                 loc_lemmas = [ent.lemma_ for ent in doc.ents if ent.label_=='LOC']
                 loc_spans = [(ent.start_char, ent.end_char) for ent in doc.ents if ent.label_=='LOC']
+                """
+                        
                 locations_found = True
 
                 sent_results = {'input_text': sent, 'doc': doc, 'locations_found': locations_found, 

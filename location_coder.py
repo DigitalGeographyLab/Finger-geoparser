@@ -10,7 +10,7 @@ import warnings
 try:
     from shapely.geometry import Point
 except (ImportError, FileNotFoundError) as e:
-    print("Unable to import Shapely. The geoparser works, but export to Shapely points unavailable.")
+    print("Unable to import Shapely. The geoparser works, but exporting to Shapely points is unavailable.")
 
 class location_coder:
     
@@ -30,7 +30,6 @@ class location_coder:
 
         #if self.shp_points:
             #from shapely.geometry import Point
-        
         self.username_count = 0
             
         if isinstance(gn_username, (list, tuple, set)):
@@ -64,7 +63,9 @@ class location_coder:
         
         self.geocoded_count = 0
         
+        self.username_count = 0
         
+
         locations = locations.apply(self.geocode_set, axis=1)
         
         return locations
@@ -88,7 +89,7 @@ class location_coder:
                 row['loc_lemmas'] = lemma_list
 
             
-            for loc in row['loc_lemmas']:
+            for loc in row['loc_lemmas']:        
                 #query geonames
                 gn_result = gn(loc, key=self.username)
                 # for every query, add one to the count
@@ -101,6 +102,18 @@ class location_coder:
                     loc_coord_points.append(None)
                     loc_names.append(None)
                     
+                    # if no error present, continue as normal
+                    if isinstance(gn_result.error, int):
+                        pass
+                    # if the system throws an error, switch the username or warn the user
+                    elif ("the hourly limit of 1000 credits") in gn_result.error:
+                        switched = self.switch_username()
+                        if switched:
+                            print("\nUsername switched to username no.", str(self.username_count+1), "\n")
+                        else:
+                            print("\nHourly rate limit exceeded and no more GN usernames left. Rest of queries will fail.\n")
+                            self.geocoded_count = 0
+                    
             if all(place==None for place in loc_names):
                 loc_coord_points = None
                 loc_names = None
@@ -110,19 +123,14 @@ class location_coder:
             
             # if count nears 1000, i.e. the hourly rate limit of a GN account
             # is filling, try to switch the account
-            if self.geocoded_count > 999:
-                switched = self.switch_username()
-                if switched:
-                    print("\nUsername switched to username no.", str(self.username_count+1), "\n")
-                else:
-                    print("\nHourly rate limit exceeded and no more GN usernames left. Rest of queries likely to fail.\n")
-                self.geocoded_count = 0
+
             
             return row
         else:
             return row
         
     def switch_username(self):
+        # if there are unused usernames left on the list, 
         if self.username_count+1 < len(self.username_list):
             self.username_count += 1
             self.username=self.username_list[self.username_count]
