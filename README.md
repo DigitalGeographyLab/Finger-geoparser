@@ -22,8 +22,8 @@ Most users will want to use the _geoparser_ module, as it wraps geoparsing pipel
 | locations | Location tokens in the og wordform, if found | *(list of) string(s)* or *none* | "Lahdessa" |
 | loc_lemmas | Lemmatized versions of the locations | *(list of) string(s)* or *none* | "Lahti" |
 | loc_spans | index of the start and end characters of the identified locations in the input text string | *tuple* | (40, 48) |
-| gn_names | Versions of the locations returned by querying GeoNames | *(list of) string(s)* or *none* | "Lahti" |
-| gn_points | Long/lat coordinate points in WGS84 | (*list of*) *tuple(s)*, *Shapely Point(s)* or *none* | (25.66151, 60.98267) |
+| names | Versions of the locations returned by querying GeoNames | *(list of) string(s)* or *none* | "Lahti" |
+| coord_points | Long/lat coordinate points in WGS84 | (*list of*) *tuple(s)*, *Shapely Point(s)* or *none* | (25.66151, 60.98267) |
 | * id |The identifying element, like tweet id, tied to each input text. Optional | *string*, *int*, *float* | "first_sentence" |
 
 
@@ -53,8 +53,8 @@ Starting geotagging...
 Finished geotagging. 1 location hits found.
 Starting geocoding...
 Total elapsed time: 0.33 s
->>>print(results[['loc_lemmas','gn_coord_points']])
-         loc_lemmas                               gn_coord_points
+>>>print(results[['loc_lemmas','coord_points']])
+         loc_lemmas                               coord_points
 0  [Lahti, Messilä]  [(25.66151, 60.98267), (25.56667, 61.01667)]
 1              None                                          None
 ```
