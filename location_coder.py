@@ -5,7 +5,6 @@ Created on Wed Mar 24 18:53:37 2021
 @author: Tatu Leppämäki
 """
 import geocoder.geonames as gn
-import warnings
 #import pandas as pd
 try:
     from shapely.geometry import Point

@@ -105,40 +105,44 @@ class location_tagger:
         loc_lemmas = []
         loc_spans = []
         locations_found = False
-        sent_results = {'input_text': sent, 'doc': doc, 'locations': None, 'loc_lemmas': None,
-                        'loc_spans': None, 'locations_found': locations_found}
+
         if doc:
             # gather the NER labels found to a list 
             labels = [ent.label_ for ent in doc.ents]
             # create the whole dict if locations are present
             if 'LOC' in labels:
                 locs = []
+                # looping through the entities, collecting required information
+                # namely, the raw toponym text, its lemmatized form and the span as tuple
                 for ent in doc.ents:
                     if ent.label_=='LOC':
+                        # apply filtering if requested
                         if self.filter_toponyms:
+                            # length filtering 
                             if len(ent.text)>1:
                                 locs.append(ent.text)
                                 loc_lemmas.append(ent.lemma_)
                                 loc_spans.append((ent.start_char, ent.end_char))
+                                locations_found = True
                         else:
                             locs.append(ent.text)
                             loc_lemmas.append(ent.lemma_)
                             loc_spans.append((ent.start_char, ent.end_char))
+                            locations_found = True
                 docs.append(doc)
                 """
                 locs = [ent.text for ent in doc.ents if ent.label_=='LOC' if self.filter_toponyms if len(ent.text)>1]
                 loc_lemmas = [ent.lemma_ for ent in doc.ents if ent.label_=='LOC']
                 loc_spans = [(ent.start_char, ent.end_char) for ent in doc.ents if ent.label_=='LOC']
                 """
-                        
-                locations_found = True
-
-                sent_results = {'input_text': sent, 'doc': doc, 'locations_found': locations_found, 
+        if locations_found:        
+            sent_results = {'input_text': sent, 'doc': doc, 'locations_found': locations_found, 
                             'locations': locs, 'loc_lemmas': loc_lemmas, 'loc_spans': loc_spans}
-                    
-            return sent_results
         else:
-            return sent_results
+            sent_results = {'input_text': sent, 'doc': doc, 'locations': None, 'loc_lemmas': None,
+                    'loc_spans': None, 'locations_found': locations_found}
+
+        return sent_results
         
     def to_dataframe(self, results, ids):
         import pandas as pd
