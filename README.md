@@ -81,7 +81,7 @@ Other resources used in either the pipeline or this code:
  - Test out the lemmatizer more. I think it might've problems with rarer place names. Like _Vesijärvellä_ is fine, but _Joutjärvellä_ doesn't get lemmatized. Extend dictionary or implement another type of lemmatizer?
  - Implement a Voikko-based typo checker and fixer.
  - Implement gazetteers/API's other than GeoNames. [Nimisampo](https://nimisampo.fi/fi/app) has potential in the Finnish context.
- - Implement text-preprocessing steps. Removing hashtags for instance?
+ - ~~Implement text-preprocessing steps. Removing hashtags for instance?~~ Rudimentary filtering of impossibly short toponyms added. Seems to work well.
  - Implement geocoding / toponym resolution step other than a simple query. The literature should provide hints.
  - Use the linguistic pipeline results (stored in the doc object) in some way. Useful in toponym resolution?
  - ~~Add an _identifier_ keyword argument. If this is present, it'll be added to the output df and can be used to identify the individual inputs (e.g. tweets by id, texts by their writer). Maybe require a list that's as long as the input list? So that each id is assumed to be in the same index as each input.~~
