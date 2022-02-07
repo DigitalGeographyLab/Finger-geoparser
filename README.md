@@ -86,3 +86,4 @@ Other resources used in either the pipeline or this code:
  - Use the linguistic pipeline results (stored in the doc object) in some way. Useful in toponym resolution?
  - ~~Add an _identifier_ keyword argument. If this is present, it'll be added to the output df and can be used to identify the individual inputs (e.g. tweets by id, texts by their writer). Maybe require a list that's as long as the input list? So that each id is assumed to be in the same index as each input.~~
  - Allow the user to limit the spatial extent of their geoparsing results by passing a bbox when calling _geoparse_
+ - Rewrite geocoding: for now, move it to use geopandas/geopy instead of Geocoder
