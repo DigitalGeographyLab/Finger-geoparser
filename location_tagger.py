@@ -47,7 +47,7 @@ class location_tagger:
 
         
     def tag_sentences(self, input_texts, ids, explode_df=False, drop_non_locs=False,
-                            filter_toponyms = True
+                            filter_toponyms = True, entity_tags=['LOC']
         ):
         """Input:            
             texts | A string or a list of input strings: The input 
@@ -80,6 +80,8 @@ class location_tagger:
         
         self.filter_toponyms = filter_toponyms
         
+        self.entity_tags = entity_tags
+        
         # loop input sentences, gather the tagged dictionary results to a list
         for sent in input_texts:
             tag_results = self.tag_sentence(sent)
@@ -109,32 +111,27 @@ class location_tagger:
         if doc:
             # gather the NER labels found to a list 
             labels = [ent.label_ for ent in doc.ents]
-            # create the whole dict if locations are present
-            if 'LOC' in labels:
-                locs = []
-                # looping through the entities, collecting required information
-                # namely, the raw toponym text, its lemmatized form and the span as tuple
-                for ent in doc.ents:
-                    if ent.label_=='LOC':
-                        # apply filtering if requested
-                        if self.filter_toponyms:
-                            # length filtering 
-                            if len(ent.text)>1:
-                                locs.append(ent.text)
-                                loc_lemmas.append(ent.lemma_)
-                                loc_spans.append((ent.start_char, ent.end_char))
-                                locations_found = True
-                        else:
+
+            locs = []
+            # looping through the entities, collecting required information
+            # namely, the raw toponym text, its lemmatized form and the span as tuple
+            for ent in doc.ents:
+                if ent.label_ in self.entity_tags:
+                    # apply filtering if requested
+                    if self.filter_toponyms:
+                        # length filtering 
+                        if len(ent.text)>1:
                             locs.append(ent.text)
-                            loc_lemmas.append(ent.lemma_)
+                            loc_lemmas.append(ent.lemma_.replace("#",""))
                             loc_spans.append((ent.start_char, ent.end_char))
                             locations_found = True
-                docs.append(doc)
-                """
-                locs = [ent.text for ent in doc.ents if ent.label_=='LOC' if self.filter_toponyms if len(ent.text)>1]
-                loc_lemmas = [ent.lemma_ for ent in doc.ents if ent.label_=='LOC']
-                loc_spans = [(ent.start_char, ent.end_char) for ent in doc.ents if ent.label_=='LOC']
-                """
+                    else:
+                        locs.append(ent.text)
+                        loc_lemmas.append(ent.lemma_.replace("#",""))
+                        loc_spans.append((ent.start_char, ent.end_char))
+                        locations_found = True
+            docs.append(doc)
+
         if locations_found:        
             sent_results = {'input_text': sent, 'doc': doc, 'locations_found': locations_found, 
                             'locations': locs, 'loc_lemmas': loc_lemmas, 'loc_spans': loc_spans}

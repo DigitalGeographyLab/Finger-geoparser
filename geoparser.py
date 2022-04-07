@@ -61,7 +61,7 @@ class geoparser:
         
         
     def geoparse(self, texts, ids=None, explode_df=False, return_shapely_points=False,
-                  drop_non_locations=False, output='all', filter_toponyms=True):
+                  drop_non_locations=False, output='all', filter_toponyms=True, entity_tags=['LOC']):
         """
         The whole geoparsing pipeline.
         
@@ -124,7 +124,8 @@ class geoparser:
         # TOPONYM RECOGNITION
         tag_results = self.tagger.tag_sentences(texts, ids, explode_df=explode_df,
                                                 drop_non_locs=drop_non_locations,
-                                                filter_toponyms=filter_toponyms)
+                                                filter_toponyms=filter_toponyms,
+                                                entity_tags=entity_tags)
 
         if self.verbose:
             successfuls = tag_results['locations_found'].tolist()
