@@ -6,9 +6,11 @@ Created on Wed Mar 24 18:55:46 2021
 """
 
 
-from location_tagger import location_tagger
-from location_coder import location_coder
-from output_formatter import create_eupeg_json
+from finger.location_tagger import location_tagger
+from finger.location_coder import location_coder
+from finger.output_formatter import create_eupeg_json
+#from finger import location_coder
+#from finger import create_eupeg_json
 import time
 
 class geoparser:

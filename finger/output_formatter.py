@@ -2,7 +2,7 @@
 """
 Created on Tue Aug 24 16:50:27 2021
 
-@author: Tadusko
+@author: Tatu Leppämäki
 """
 
 import json
