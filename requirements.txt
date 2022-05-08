@@ -1,5 +1,0 @@
-pandas==1.1.5
-geocoder==1.38.1
-spacy==3.0.5
-Shapely==1.7.1
-libvoikko==4.3
