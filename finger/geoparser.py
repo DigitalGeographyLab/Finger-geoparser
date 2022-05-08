@@ -9,8 +9,7 @@ Created on Wed Mar 24 18:55:46 2021
 from finger.location_tagger import location_tagger
 from finger.location_coder import location_coder
 from finger.output_formatter import create_eupeg_json
-#from finger import location_coder
-#from finger import create_eupeg_json
+
 import time
 
 class geoparser:
@@ -135,7 +134,7 @@ class geoparser:
             print("Starting geocoding...")
         
         # TOPONYM RESOLVING
-        geocode_results = self.coder.geocode_batch(tag_results, shp_points=return_shapely_points,
+        geocode_results = self.coder.geocode_batch(tag_results, shp_points=False,
                                                    exploded=explode_df)
         
         
