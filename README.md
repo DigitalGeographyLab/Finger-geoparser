@@ -1,6 +1,6 @@
-![Finger Geoparser logo](FINGER_logo_transparent.png?raw=true "Finger logo")
+![Finger Geoparser logo](https://github.com/Tadusko/fi-geoparser/blob/master/FINGER_logo_transparent.png?raw=true "Finger logo")
 # Finger: Finnish geoparser
-_Geoparsing_ is the process of finding location mentions (toponyms or place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). This is the first implementation of a Finnish geoparser, built on state-of-the-art methods yet using established Python libraries. This program consists of three classes: the location tagger, the location coder, and the geoparser, which wraps the two previous classes.
+_Geoparsing_ is the process of finding location mentions (toponyms, aka. place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). Finger is a geoparser for Finnish texts. This program consists of three classes: the toponym recognizer, the toponym resolver, and the geoparser, which wraps the two previous modules.
 
 ### Toponym recognizer (geotagger)
 The geotagger is built using [Spacy NLP library](https://spacy.io/) and it implements BERT-based language model for a more accurate representation of language and thus better results. The pipeline runs a complete linguistic analysis (part-of-speech tagging, morphological analysis, dependency parsing, token and sentence segmentation, lemmatization), but named entity recognition (NER) is the important part. Input texts' named locations, such as countries, lakes and important sights, are recognized, then returned to their base form using the lemmatizer. These results are passed on to the geocoder.
@@ -30,17 +30,25 @@ Most users will want to use the _geoparser_ module, as it wraps geoparsing pipel
 NOTE. There's some redundancy in the output currently. This is mostly because I want to cover every base at this point. The data model is still subject to change as the work progresses.
 
 ## Usage
-The package isn't currently on any packaging index (pip, conda) and must thus be copied from this source. There are number of preparation steps involved to use this pipeline.
+There are number of preparation steps involved to use this geoparser.
 ### Preparations
- - Copy this repo with for example downloading the zip version. 
- - pip install the requirements.txt file (hopefully has everything needed)
- - Install Spacy pipeline. NOTE The installation file isn't currently publicly available (I've shared it in Slack).
-   - Download the roughly 1 GB tar.gz file and install by pip install on the file. This should add a package called _fi\_geoparser_ on your current environment. It can be loaded simply by calling spacy.load('fi_geoparser')
- - [Voikko](https://voikko.puimula.org/) is used for lemmatizing the input texts. It requires downloading a dictionary file (all OS's) and DLL file (on Windows). Follow the instructions listed [here](https://voikko.puimula.org/python.html).
+ - I highly recommend creating [a virtual environment](https://docs.python.org/3/tutorial/venv.html) to prevent clashes with other packages.
+ - Install Finger from [Pypi](https://pypi.org/) with 
+ ```python
+ pip install finger
+ ```
+ - This should install all the dependencies and the geoparser.
+ - Next, you'll need the spaCy pipeline, which for example includes the fine-tuned BERT model. The pipeline wheel is released [here](https://github.com/Tadusko/finger-NLP-resources/releases/tag/v0.1.0). Simply install it like this:
+  ```python
+ pip install https://github.com/Tadusko/finger-NLP-resources/releases/download/v0.1.0/fi_geoparser-0.1.0-py3-none-any.whl
+ ```
+ - This adds the pipeline (*fi_geoparser*) in your pip environment.
+ - [Voikko](https://voikko.puimula.org/) is used for lemmatizing (e.g. Turussa -> Turku) the input texts.
+   - Using voikko may require downloading a dictionary file and a DLL file (on Windows). Follow the instructions listed [here](https://voikko.puimula.org/python.html) if you get voikko related errors.
    - NOTE getting the DLL to work on Windows can be a hassle. I had to add path to the folder with the DLL as a system path.
- - Create a [GeoNames](https://www.geonames.org/) account. The account's username is used as an API key when querying GN.
+ - Create a [GeoNames](https://www.geonames.org/) account (or a few). The account's username is used as an API key when querying GN and is provided for Finger when geoparsing.
 
-These steps need only be run once.
+These steps need only be done once.
 ### Usage example
 Python interpreter is started in the Finnish geoparser folder and in an environment with the required installations.
 
