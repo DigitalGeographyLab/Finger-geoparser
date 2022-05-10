@@ -6,11 +6,12 @@ Created on Wed Mar 24 18:53:37 2021
 """
 import geocoder.geonames as gn
 #import pandas as pd
+"""
 try:
     from shapely.geometry import Point
 except (ImportError, FileNotFoundError) as e:
     print("Unable to import Shapely. The geoparser works, but exporting to Shapely points is unavailable.")
-
+"""
 class location_coder:
     
     def __init__(self, gn_username=""):
@@ -27,8 +28,6 @@ class location_coder:
         Pass your account name as gn_username parameter.
         """
 
-        #if self.shp_points:
-            #from shapely.geometry import Point
         self.username_count = 0
             
         if isinstance(gn_username, (list, tuple, set)):

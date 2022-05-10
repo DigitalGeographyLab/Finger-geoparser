@@ -6,9 +6,10 @@ Created on Wed Mar 24 18:55:46 2021
 """
 
 
-from location_tagger import location_tagger
-from location_coder import location_coder
-from output_formatter import create_eupeg_json
+from finger.location_tagger import location_tagger
+from finger.location_coder import location_coder
+from finger.output_formatter import create_eupeg_json
+
 import time
 
 class geoparser:
@@ -61,7 +62,7 @@ class geoparser:
         
         
     def geoparse(self, texts, ids=None, explode_df=False, return_shapely_points=False,
-                  drop_non_locations=False, output='all', filter_toponyms=True):
+                  drop_non_locations=False, output='all', filter_toponyms=True, entity_tags=['LOC']):
         """
         The whole geoparsing pipeline.
         
@@ -124,7 +125,8 @@ class geoparser:
         # TOPONYM RECOGNITION
         tag_results = self.tagger.tag_sentences(texts, ids, explode_df=explode_df,
                                                 drop_non_locs=drop_non_locations,
-                                                filter_toponyms=filter_toponyms)
+                                                filter_toponyms=filter_toponyms,
+                                                entity_tags=entity_tags)
 
         if self.verbose:
             successfuls = tag_results['locations_found'].tolist()
@@ -132,7 +134,7 @@ class geoparser:
             print("Starting geocoding...")
         
         # TOPONYM RESOLVING
-        geocode_results = self.coder.geocode_batch(tag_results, shp_points=return_shapely_points,
+        geocode_results = self.coder.geocode_batch(tag_results, shp_points=False,
                                                    exploded=explode_df)
         
         
