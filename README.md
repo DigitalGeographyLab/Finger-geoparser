@@ -33,9 +33,9 @@ NOTE. There's some redundancy in the output currently. This is mostly because I 
 There are number of preparation steps involved to use this geoparser.
 ### Preparations
  - I highly recommend creating [a virtual environment](https://docs.python.org/3/tutorial/venv.html) to prevent clashes with other packages.
- - Install Finger from [Pypi](https://pypi.org/) with 
+ - Install Finger from [Pypi](https://pypi.org/project/fingerGeoparser/) with 
  ```python
- pip install finger
+pip install fingerGeoparser
  ```
  - This should install all the dependencies and the geoparser.
  - Next, you'll need the spaCy pipeline, which for example includes the fine-tuned BERT model. The pipeline wheel is released [here](https://github.com/Tadusko/finger-NLP-resources/releases/tag/v0.1.0). Simply install it like this:
