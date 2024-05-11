@@ -3,14 +3,16 @@
 Created on Wed Mar 24 18:55:46 2021
 
 @author: Tatu Leppämäki
+
 """
 
 
-from finger.location_tagger import location_tagger
-from finger.location_coder import location_coder
+from finger.toponym_tagger import toponym_tagger
+from finger.toponym_coder import toponym_coder
 from finger.output_formatter import create_eupeg_json
 
-import time
+
+import time, asyncio, pandas as pd
 
 class geoparser:
     """
@@ -32,8 +34,12 @@ class geoparser:
 
     """
     
-    def __init__(self, pipeline_path="fi_geoparser", use_gpu=False, 
-                 output_df=True, gn_username="", verbose=True):
+    def __init__(self,
+             pipeline_path="fi_geoparser",
+             use_gpu=False,
+             output_df=True,
+             verbose=True,
+             geocoder_url="http://vm5121.kaj.pouta.csc.fi:4000/v1/"):
         """
         Parameters:
         pipeline_path | String: name of the Spacy pipeline, which is called with spacy.load().
@@ -46,64 +52,87 @@ class geoparser:
                            
         output_df | Boolean: If True, the output will be a Pandas DataFrame. False does nothing currently.
         
-        gn_username | String: GeoNames API key, or username, which is used for geocoding.
-                              Mandatory, get from https://www.geonames.org/
-        
         verbose | Boolean: Prints progress reports. Default True.
         
+        geocoder_url : str, optional
+            URL for the Pelias geocoder instance. Default instance is maintained by the author for now and is located at "http://vm5121.kaj.pouta.csc.fi:4000/v1/".
 
         """
 
-        self.tagger = location_tagger(pipeline_path, use_gpu=use_gpu)
+        self.tagger = toponym_tagger(pipeline_path, use_gpu=use_gpu)
         
-        self.coder = location_coder(gn_username=gn_username)
+        self.coder = toponym_coder(geocoder_url)
         
         self.verbose=verbose
         
         
-    def geoparse(self, texts, ids=None, explode_df=False, return_shapely_points=False,
-                  drop_non_locations=False, output='all', filter_toponyms=True, entity_tags=['LOC']):
+    def geoparse(self, 
+             texts, 
+             ids=None, 
+             explode_df=True, 
+             return_shapely_points=False, 
+             preprocess_texts=False,
+             drop_non_locations=False, 
+             output='all', 
+             filter_toponyms=True, 
+             entity_tags=['LOC', 'FAC', 'GPE'],
+             geocoder_columns =['coordinates', 'gid', 'layer', 'label', 'bbox'],
+             geocoder_params = None):
         """
         The whole geoparsing pipeline.
-        
+
         Input:
-            texts | A string or a list of input strings: The input text(s)
-            *ids | String, int, float or a list: Identifying element of each input, e.g. tweet id. Must be 
-                  the same length as texts
-            *explode_df | Boolean: Whether to have each location "hit" on separate rows in the output. Default False
-            *return_shapely_points | Boolean: Whether the coordinate points of the locations are 
-                                         regular tuples or Shapely points. Default False.
-            *drop_non_locations | Boolean: Whether the sentences where no locations were found are
-                                        included in the output. Default False (non-locs are included).
-            *output | String: What's included in the output and in what format it is.
-                                        Possible values: 
-                                            1. 'all': All columns listed below as a dataframe
-                                            TODO 2. 'essential': Dataframe trimmed down selection of columns
-                                            3. 'eupeg': 
-            *filter_toponyms | Boolean: Whether to filter out almost certain false positive toponyms.
-                                        Currently removes toponyms with length less than 2. Default True.
+            texts | str or List[str]: A string or a list of input strings representing the text(s) to be processed.
             
-        Output columns:
-            Pandas Dataframe containing columns:
-                1. input_text: the input sentence | String
-                2. doc: Spacy doc object of the sent analysis. See https://spacy.io/api/doc | Doc
-                3. locations_found: Whether locations were found in the input sent | Bool
-                4. locations: locations in the input text, if found | list of strings or None
-                5. loc_lemmas: lemmatized versions of the locations | list of strings or None
-                6. loc_spans: the index of the start and end characters of the identified 
-                              locations in the input text string | tuple
-                7. input_order: the index of the inserted texts. i.e. the first text is 0, the second 1 etc.
-                                Makes it easier to reassemble the results if they're exploded | int'
-                8. names: versions of the names returned by querying GeoNames | List of strins or None
-                9. coord_points: long/lat coordinate points in WGS84 | list of long/lat tuples or Shapely points
-                10.*id: The identifying element tied to each input text, if provided | string, int, float
-            OR
-            EUPEG (see here: https://github.com/geoai-lab/EUPEG) style json dump, with restucturing data and renaming headers to be in line. 
-            Mostly meant for evaluation purposes. This option only allows one text to be processed at once (no batch processing).
+            ids | str, int, float, or List[str/int/float], optional: Identifying element of each input, e.g., tweet id. 
+                  Must be the same length as texts. Default is None.
+                  
+            explode_df | bool, optional: Whether to have each location "hit" on separate rows in the output. Default is True.
             
+            return_shapely_points | bool, optional: Whether the coordinate points of the locations are regular tuples 
+                                                or Shapely points. Default is False.
+                                                
+            preprocess_texts | bool, optional: Whether to preprocess the input texts before geoparsing. Default is False.
+            
+            drop_non_locations | bool, optional: Whether the sentences where no locations were found are included in the output. 
+                                                Default is False (non-locs are included).
+                                                
+            output | str, optional: What's included in the output and in what format it is. Possible values: 
+                                    'all': All columns listed below as a dataframe
+                                    'eupeg': EUPEG style JSON dump. Default is 'all'.
+                                    
+            filter_toponyms | bool, optional: Whether to filter out almost certain false positive toponyms. 
+                                               Currently removes toponyms with a length less than 2. Default is True.
+                                               
+            entity_tags | List[str], optional: Which named entity tags to count as toponyms. Default is ['LOC', 'FAC', 'GPE'].
+            
+            geocoder_columns | List[str], optional: Columns to include in the geocoder results. Default is 
+                                                     ['coordinates', 'gid', 'layer', 'label', 'bbox'].
+            geocoder_params | Dict[str], optional: Parameters to limit the search to, for example, a certain country. Provide as {'parameter':'value'} dictionaries. For example: {'boundary.country':'FIN'} See https://github.com/pelias/documentation/blob/master/search.md for a full list of search parameters.
+
+        Output:
+            Pandas DataFrame containing columns:
+                - input_text: the input sentence
+                - doc: Spacy doc object of the sent analysis.
+                - locations_found: Whether locations were found in the input sent.
+                - locations: locations in the input text, if found.
+                - loc_lemmas: lemmatized versions of the locations.
+                - loc_spans: the index of the start and end characters of the identified locations 
+                              in the input text string.
+                - input_order: the index of the inserted texts. i.e., the first text is 0, the second 1, etc.
+                               Makes it easier to reassemble the results if they're exploded.
+                - names: versions of the names returned by querying GeoNames.
+                - coord_points: long/lat coordinate points in WGS84.
+
+        Returns:
+            Pandas DataFrame or dict: Depending on the 'output' parameter, either a Pandas DataFrame is returned 
+                                       containing the geoparsing results, or a dictionary in EUPEG style JSON format.
         """
-        assert texts, "Input missing. Expecting a (list of) strings."
-        
+
+        # Validate inputs
+        if not texts:
+            raise ValueError("Input texts are missing. Expecting a string or a list of strings.")
+
         # fix if someone passes just a string
         if isinstance(texts, str):
             texts = [texts]
@@ -115,7 +144,8 @@ class geoparser:
         if ids:
             if isinstance(ids, (str, int, float)):
                 ids = [ids]
-            assert len(texts) == len(ids), "If ids are passed, the number of ids and texts must be equal."
+            if len(ids) != len(texts):
+                raise ValueError("If ids are provided, the number of ids must be equal to the number of texts.")
             
         
         if self.verbose:
@@ -126,23 +156,33 @@ class geoparser:
         tag_results = self.tagger.tag_sentences(texts, ids, explode_df=explode_df,
                                                 drop_non_locs=drop_non_locations,
                                                 filter_toponyms=filter_toponyms,
-                                                entity_tags=entity_tags)
+                                                entity_tags=entity_tags,
+                                               preprocess=preprocess_texts)
 
         if self.verbose:
-            successfuls = tag_results['locations_found'].tolist()
+            successfuls = tag_results['toponyms_found'].tolist()
             print("Finished geotagging after", round(time.time()-t, 2),"s.", successfuls.count(True), "location hits found.")
             print("Starting geocoding...")
         
         # TOPONYM RESOLVING
-        geocode_results = self.coder.geocode_batch(tag_results, shp_points=False,
-                                                   exploded=explode_df)
+        # TODO: Reimplement shp_points
+        geocode_results = asyncio.run(self.coder.geocode_toponyms(tag_results['topo_lemmas'].tolist(),
+                                                   columns=geocoder_columns))
+
         
+        geocoded =  pd.DataFrame(geocode_results)
         
-        if self.verbose:    
+        tag_results = tag_results.reset_index(drop=True)
+        
+        # concatenate (add the columns) from the geocoder results to the tagging results to produce the final result
+        results = pd.concat([tag_results, geocoded], axis=1)
+        
+        if self.verbose:
             print("Finished geocoding, returning output.")
             print("Total elapsed time:", round(time.time()-t, 2),"s")
             
         if output.lower() == 'eupeg':
-            return create_eupeg_json(geocode_results)
+            return create_eupeg_json(results)
         else:
-            return geocode_results
+            return results
+
