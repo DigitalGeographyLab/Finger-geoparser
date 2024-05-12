@@ -1,0 +1,9 @@
+# Ignore Python cache files
+__pycache__/
+
+# Ignore system and editor files
+.DS_Store
+*.swp
+*.swo
+*.bak
+*~
