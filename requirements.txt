@@ -1,0 +1,5 @@
+pandas
+spacy==3.5.2
+spacy-transformers==1.1.9
+tqdm
+aiohttp
