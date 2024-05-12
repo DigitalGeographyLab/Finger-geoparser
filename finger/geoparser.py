@@ -7,9 +7,9 @@ Created on Wed Mar 24 18:55:46 2021
 """
 
 
-from fingerGeoparser.toponym_tagger import toponym_tagger
-from fingerGeoparser.toponym_coder import toponym_coder
-from fingerGeoparser.output_formatter import create_eupeg_json
+from finger.toponym_tagger import toponym_tagger
+from finger.toponym_coder import toponym_coder
+from finger.output_formatter import create_eupeg_json
 
 
 import time, asyncio, pandas as pd

@@ -1,7 +1,7 @@
 import sys
 print(sys.path)
 
-from fingerGeoparser import geoparser
+from finger import geoparser
 
 def test_constructor():
     gp = geoparser.geoparser(pipeline_path="fi_core_news_sm")
