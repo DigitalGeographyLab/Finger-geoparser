@@ -1,5 +1,6 @@
 ![Finger Geoparser logo](https://github.com/Tadusko/fi-geoparser/blob/master/FINGER_logo_transparent.png?raw=true "Finger logo")
-## THIS REPOSITORY IS IN A FLUX AND WILL BE UPDATED SUBSTANTIALLY VERY SOON
+## This project will has had significant updates recently.
+## Updated documentation will be added in May 2024.
 
 # Finger: Finnish geoparser
 _Geoparsing_ is the process of finding location mentions (toponyms, aka. place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). Finger is a geoparser for Finnish texts. This program consists of three classes: the toponym recognizer, the toponym resolver, and the geoparser, which wraps the two previous modules.
