@@ -1,4 +1,7 @@
 ![Finger Geoparser logo](https://github.com/Tadusko/fi-geoparser/blob/master/FINGER_logo_transparent.png?raw=true "Finger logo")
+## This project has had significant updates and rewrites recently.
+## Updated documentation will be added in May 2024.
+
 # Finger: Finnish geoparser
 _Geoparsing_ is the process of finding location mentions (toponyms, aka. place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). Finger is a geoparser for Finnish texts. This program consists of three classes: the toponym recognizer, the toponym resolver, and the geoparser, which wraps the two previous modules.
 
@@ -33,9 +36,9 @@ NOTE. There's some redundancy in the output currently. This is mostly because I 
 There are number of preparation steps involved to use this geoparser.
 ### Preparations
  - I highly recommend creating [a virtual environment](https://docs.python.org/3/tutorial/venv.html) to prevent clashes with other packages.
- - Install Finger from [Pypi](https://pypi.org/) with 
+ - Install Finger from [Pypi](https://pypi.org/project/fingerGeoparser/) with 
  ```python
- pip install finger
+pip install fingerGeoparser
  ```
  - This should install all the dependencies and the geoparser.
  - Next, you'll need the spaCy pipeline, which for example includes the fine-tuned BERT model. The pipeline wheel is released [here](https://github.com/Tadusko/finger-NLP-resources/releases/tag/v0.1.0). Simply install it like this:
