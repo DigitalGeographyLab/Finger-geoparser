@@ -1,5 +1,5 @@
 ![Finger Geoparser logo](https://github.com/Tadusko/fi-geoparser/blob/master/FINGER_logo_transparent.png?raw=true "Finger logo")
-## This project will has had significant updates recently.
+## This project has had significant updates and rewrites recently.
 ## Updated documentation will be added in May 2024.
 
 # Finger: Finnish geoparser
