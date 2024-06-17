@@ -1,15 +1,16 @@
-![Finger Geoparser logo](https://github.com/Tadusko/fi-geoparser/blob/master/FINGER_logo_transparent.png?raw=true "Finger logo")
+![Finger Geoparser logo](https://github.com/DigitalGeographyLab/Finger-geoparser/blob/master/FINGER_logo_transparent.png?raw=true "Finger logo")
 ## This project has had significant updates and rewrites recently.
-## Updated documentation will be added in May 2024.
+## Documentation will be updated over June.
 
-# Finger: Finnish geoparser
-_Geoparsing_ is the process of finding location mentions (toponyms, aka. place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). Finger is a geoparser for Finnish texts. This program consists of three classes: the toponym recognizer, the toponym resolver, and the geoparser, which wraps the two previous modules.
+# Finger: the Finnish geoparser
+## Overview
+_Geoparsing_ is the process of finding location mentions (toponyms, aka. place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). Finger is a geoparser for Finnish texts. For toponym recognition, Finger uses a fine-tuned model of the [Spacy NLP library](https://spacy.io/).  This program consists of three classes: the toponym recognizer, the toponym resolver, and the geoparser, which wraps the two previous modules. It uses a language model fine-tuned for extracting place names and a geocoder service for locating them.
 
 ### Toponym recognizer (geotagger)
-The geotagger is built using [Spacy NLP library](https://spacy.io/) and it implements BERT-based language model for a more accurate representation of language and thus better results. The pipeline runs a complete linguistic analysis (part-of-speech tagging, morphological analysis, dependency parsing, token and sentence segmentation, lemmatization), but named entity recognition (NER) is the important part. Input texts' named locations, such as countries, lakes and important sights, are recognized, then returned to their base form using the lemmatizer. These results are passed on to the geocoder.
+The geotagger is built using [Spacy NLP library](https://spacy.io/). The pipeline first recognizes place names using a named entity recognition (NER) tagger, then extracts lemmatized versions of the recognized toponyms. These results are passed on to the geocoder.
 
 ### Toponym resolver (geocoder)
-The geocoder currently simply queries the [GeoNames](https://www.geonames.org/) gazetteer using the Python library [Geocoder](https://geocoder.readthedocs.io/) and outputs coordinate points, if matches are found. I plan to expand this functionality in the future.
+The geocoder queries a geocoder online services based on Pelias
 
 ### Data model
 Currently, the program accepts strings or lists of strings as input. The input is assumed to be in Finnish and segmented to short-ish pieces (so that the input isn't for example a whole book chapter as a string). 
@@ -77,24 +78,15 @@ help(geoparser)
 ### License and credits
 The source code is licensed under the MIT license.
 
+### Citation
+If you use this work in a scientific publication, please cite the following article:
+```
+(In the process of being published, I'll update this soon)
+https://doi.org/10.1080/13658816.2024.2369539
+```
+
 
 Other resources used in either the pipeline or this code:
  - [FinBERT](https://turkunlp.org/finnish_nlp.html#finbert) language model by TurkuNLP, CC BY 4.0. See [Virtanen, Kanerva, Ilo, Luoma, Luotolahti, Salakoski, Ginter and Pyysalo; 2019](https://arxiv.org/pdf/1912.07076.pdf)
  - [Turku NER Corpus](https://github.com/TurkuNLP/turku-ner-corpus) by TurkuNLP, CC BY 4.0. See [Luoma, Oinonen, Pyykönen, Laippala and Pyysalo; 2020](https://www.aclweb.org/anthology/2020.lrec-1.567.pdf)
  - [Spacy-fi pipeline](https://github.com/aajanki/spacy-fi) by Antti Ajanki, MIT License.
-
-### TODO
- - ~~Alter the output so that each successfully geoparsed toponym is in a row of its own. Toponyms from the same input can be connected with an id from another column.~~
- - ~~Add toponym's location in the input, e.g. character span in the input string from start to end, as a column.~~
- - Package this project and make it pip-installable. Overall, make installation and usage more straightforward.
- - Learn more about and implement tests.
- - Some sort of config file or argument parser instead of passing parameters to the _geoparse_ method?
- - Test out the lemmatizer more. I think it might've problems with rarer place names. Like _Vesijärvellä_ is fine, but _Joutjärvellä_ doesn't get lemmatized. Extend dictionary or implement another type of lemmatizer?
- - Implement a Voikko-based typo checker and fixer.
- - Implement gazetteers/API's other than GeoNames. [Nimisampo](https://nimisampo.fi/fi/app) has potential in the Finnish context.
- - ~~Implement text-preprocessing steps. Removing hashtags for instance?~~ Rudimentary filtering of impossibly short toponyms added. Seems to work well.
- - Implement geocoding / toponym resolution step other than a simple query. The literature should provide hints.
- - Use the linguistic pipeline results (stored in the doc object) in some way. Useful in toponym resolution?
- - ~~Add an _identifier_ keyword argument. If this is present, it'll be added to the output df and can be used to identify the individual inputs (e.g. tweets by id, texts by their writer). Maybe require a list that's as long as the input list? So that each id is assumed to be in the same index as each input.~~
- - Allow the user to limit the spatial extent of their geoparsing results by passing a bbox when calling _geoparse_
- - Rewrite geocoding: for now, move it to use geopandas/geopy instead of Geocoder
