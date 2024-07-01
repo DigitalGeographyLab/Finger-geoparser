@@ -1,6 +1,4 @@
 ![Finger Geoparser logo](https://github.com/DigitalGeographyLab/Finger-geoparser/blob/master/FINGER_logo_transparent.png?raw=true "Finger logo")
-## This project has had significant updates and rewrites recently.
-## Documentation will be updated over June.
 
 # Finger: the Finnish geoparser
 ## Overview
