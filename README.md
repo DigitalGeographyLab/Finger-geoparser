@@ -4,10 +4,10 @@
 
 # Finger: the Finnish geoparser
 ## Overview
-_Geoparsing_ is the process of finding location mentions (toponyms, aka. place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). Finger is a geoparser for Finnish texts. For toponym recognition, Finger uses a fine-tuned model of the [Spacy NLP library](https://spacy.io/). The same model _lemmatizes_ recognized toponyms, that is, transforms them to a base form (_Helsingissä_ –> _Helsinki_). Finally, the lemmatized toponyms are resolved to locations by querying This program consists of three classes: the toponym recognizer, the toponym resolver, and the geoparser, which wraps the two previous modules. It uses a language model fine-tuned for extracting place names and a geocoder service for locating them.
+_Geoparsing_ is the process of finding location mentions (toponyms, aka. place names) in texts (toponym recognition or _geotagging_) and defining geographical representations, such as coordinate points, for them (toponym resolution or _geocoding_). Finger is a geoparser for Finnish texts. For toponym recognition, Finger uses a fine-tuned model trained for the [Spacy NLP library](https://spacy.io/). The same model _lemmatizes_ recognized toponyms, that is, transforms them to a base form (_Helsingissä_ –> _Helsinki_). Finally, the lemmatized toponyms are resolved to locations by querying a geocoder. Currently, we upkeep a geocoder based on [_Pelias_](https://www.pelias.io/). This program consists of three classes: the toponym recognizer, the toponym resolver, and the geoparser, which wraps the two previous modules. It uses a language model fine-tuned for extracting place names and a geocoder service for locating them.
 
 ## Tiivistelmä suomeksi
-_Geojäsentäminen_ viittaa paikannimien löytämiseen ja paikantamiseen jäsentelemättömistä teksteistä. _Finger_ on Python-ohjelmisto suomenkielisten tekstiaineistojen geojäsentämiseen. Paikannimien tunnistaminen ja perusmuotoistaminen (esim. _Helsingistä_ –> _Helsinki_) tehdään [spaCy-kirjaston]((https://spacy.io/)) avulla. Paikannimien sijainnin ratkaiseminen on [Pelias-geokoodarilla](https://www.pelias.io/). Tarjoamme toistaiseksi Pelias-geokoodarin
+_Geojäsentäminen_ viittaa paikannimien löytämiseen ja paikantamiseen jäsentelemättömistä teksteistä. _Finger_ on Python-ohjelmisto suomenkielisten tekstiaineistojen geojäsentämiseen. Paikannimien tunnistaminen ja perusmuotoistaminen (esim. _Helsingistä_ –> _Helsinki_) tehdään [spaCy-kirjaston]((https://spacy.io/)) avulla. Paikannimien sijainnin ratkaiseminen on [Pelias-geokoodarilla](https://www.pelias.io/). Ylläpidämme toistaiseksi _[Pelias-geokoodariin](https://www.pelias.io/)_ perustuvaa geokoodauspalvelua CSC:n palvelimilla tömön
 
 ## Getting started
 Finger is available through [pypi](https://pypi.org/project/fingerGeoparser/).
@@ -31,7 +31,7 @@ Alternatively, we have trained a model based on [Finnish BERT](https://huggingfa
 from fingerGeoparser import geoparser
 
 # initializing the geoparser
-# model name (if it has been pip installed) or path is provided; in this example, we use spaCy's small pretrained model 
+# model name (if it has been pip installed) or path is provided; in this example, we use spaCy's small pretrained model
 gp = geoparser.geoparser(pipeline_path="fi_core_news_sm")
 
 # defining inputs
@@ -72,13 +72,6 @@ Most users will want to use the _geoparser_ module, as it wraps geoparsing pipel
 
 NOTE. The data model still subject to change as the work progresses.
 
-
-### Toponym recognizer (geotagger)
-The geotagger is built using [Spacy NLP library](https://spacy.io/). The pipeline first recognizes place names using a named entity recognition (NER) tagger, then extracts lemmatized versions of the recognized toponyms. These results are passed on to the geocoder.
-
-### Toponym resolver (geocoder)
-The geocoder queries a geocoder online services based on Pelias
-
 ### License and credits
 The source code is licensed under the MIT license.
 
@@ -88,14 +81,24 @@ This geoparser was developed by Tatu Leppämäki of the Digital Geography Lab, U
 Other resources used in either the pipeline or this code:
  - [Finnish BERT](https://turkunlp.org/finnish_nlp.html#finbert) language model by TurkuNLP, CC BY 4.0. See [Virtanen, Kanerva, Ilo, Luoma, Luotolahti, Salakoski, Ginter and Pyysalo; 2019](https://arxiv.org/pdf/1912.07076.pdf)
  - [Turku NER corpus](https://github.com/TurkuNLP/turku-ner-corpus) by TurkuNLP, CC BY 4.0. See [Luoma, Oinonen, Pyykönen, Laippala and Pyysalo; 2020](https://www.aclweb.org/anthology/2020.lrec-1.567.pdf)
- - [UD_Finnish TDT corpus](https://github.com/UniversalDependencies/UD_Finnish-TDT/tree/master) CC BY SA 4.0.
+ - [UD_Finnish TDT corpus](https://github.com/UniversalDependencies/UD_Finnish-TDT/tree/master) CC BY SA 4.0. See [Haverinen et al. 2014](http://dx.doi.org/10.1007/s10579-013-9244-1); [Pyysalo et al. 2015](https://aclweb.org/anthology/W/W15/W15-1821.pdf)
 (Older versions)
  - [Spacy-fi pipeline](https://github.com/aajanki/spacy-fi) by Antti Ajanki, MIT License.
 
 ### Citation
-If you use this work in a scientific publication, please cite the following article:
+If you use the geoparser or related resources in a scientific publication, please cite the following article:
 ```
-(In the process of being published, I'll update this soon)
-https://doi.org/10.1080/13658816.2024.2369539
+@article{doi:10.1080/13658816.2024.2369539,
+author = {Tatu Leppämäki, Tuuli Toivonen and Tuomo Hiippala},
+title = {Geographical and linguistic perspectives on developing geoparsers with generic resources},
+journal = {International Journal of Geographical Information Science},
+volume = {0},
+number = {0},
+pages = {1--22},
+year = {2024},
+publisher = {Taylor \& Francis},
+doi = {10.1080/13658816.2024.2369539},
+URL = {https://doi.org/10.1080/13658816.2024.2369539}
+}
 ```
 
